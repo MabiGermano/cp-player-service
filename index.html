@@ -1,0 +1,54 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poc 01</title>
+    <script src="https://www.youtube.com/player_api"></script>
+</head>
+
+<body>
+    <div id="ytplayer"></div>
+    <div id="info"></div>
+
+    <script>
+        var player;
+
+        function onYouTubePlayerAPIReady() {
+            player = new YT.Player('ytplayer', {
+                height: '360',
+                width: '640',
+                videoId: 'tcYodQoapMg',
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            //event.target.playVideo();
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PAUSED) {
+                const time = getFormattedTime(player.getCurrentTime());
+                document.querySelector('#info').innerHTML = `Foi passado para o tempo: ${time}`;
+            }
+        }
+
+        function stopVideo() {
+            player.stopVideo();
+        }
+
+        function getFormattedTime(timeInSeconds) {
+            return timeInSeconds < 60 ?
+                `0:${Math.trunc(timeInSeconds)}` :
+                `${Math.trunc(timeInSeconds / 60)}:${Math.trunc(timeInSeconds % 60)}`;
+        }
+
+    </script>
+</body>
+
+</html>
