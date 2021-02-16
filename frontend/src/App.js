@@ -1,6 +1,7 @@
 import './App.css';
 import socketIOClient from 'socket.io-client';
 import { useEffect, useState } from 'react';
+import Routes from './routes';
 const ENDPOINT = 'http://localhost:3333';
 
 function App() {
@@ -14,9 +15,7 @@ function App() {
   }, []);
 
   return (
-    <p>
-      It's <span>{response}</span>
-    </p>
+    <Routes/>
   )
 }
 export default App;
