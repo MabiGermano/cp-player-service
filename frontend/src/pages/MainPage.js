@@ -1,36 +1,24 @@
 import YouTube from 'react-youtube';
-import { PlayerEvents } from '../utils/YouTubeEventsEnum';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { onPlayerStateChange, onReadyEvent } from '../service/PlayerService';
+import socketIOClient from 'socket.io-client';
+
+const ENDPOINT = 'http://localhost:3333';
 
 function MainPage() {
-    const [time, setTime] = useState(0);
-
-    function onReadyEvent(event) {
-        event.target.pauseVideo();
-    }
+    const [response, setResponse] = useState(0);
+    let socket;
     
-    function onPlayerStateChange(event) {
-        if (event.data === PlayerEvents.PAUSED) {
-            setTime(getFormattedTime(event.target.getCurrentTime()));
-        }
-    }
+    useEffect(() => {
+        socket = socketIOClient(ENDPOINT);
 
-    function getFormattedTime(timeInSeconds) {
-        return timeInSeconds < 60 ?
-            `0:${Math.trunc(timeInSeconds)}` :
-            `${Math.trunc(timeInSeconds / 60)}:${Math.trunc(timeInSeconds % 60)}`;
-    }
-
-    const opts = {
-        height: '360',
-        width: '640',
-    };
+      }, []);
+  
 
 return (
 
     <main>
-        <YouTube videoId="tcYodQoapMg" opts={opts} onReady={onReadyEvent} onStateChange={onPlayerStateChange} />
-        {time}
+        <YouTube videoId="tcYodQoapMg" onReady={onReadyEvent} onStateChange={event => onPlayerStateChange(event, socket)} />
     </main>
 );
 }

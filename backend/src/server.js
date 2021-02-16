@@ -26,16 +26,16 @@ io.on('connection', (socket) => {
     if (interval) {
         clearInterval(interval);
     }
-    interval = setInterval(() => getApiAndEmit(socket), 1000);
+
+    socket.on('PlayerAction', (time) => {
+        console.log('ação feita');
+        socket.broadcast.emit('SetTune', time);
+    });
+    
     socket.on('disconnect', () => {
         console.log('Client disconnected');
-        clearInterval(interval);
     });
 });
 
-const getApiAndEmit = socket => {
-    const response = new Date();
-    socket.emit('FromAPI', response);
-};
 
 server.listen(3333, () => console.log(`Listening on port 3333`));

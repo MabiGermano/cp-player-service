@@ -6,5 +6,3 @@ export const PlayerEvents = {
     BUFFERING: 3,
     CUED: 5
 };
-
-// export default PlayerEvents;
