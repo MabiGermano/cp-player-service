@@ -1,21 +1,18 @@
-import { useState } from 'react';
 import YouTube from 'react-youtube';
-function MainPage() {
-    const [t, setT] = useState(-1);
+import { PlayerEvents } from '../utils/YouTubeEventsEnum';
+import { useState } from 'react';
 
+function MainPage() {
+    const [time, setTime] = useState(0);
 
     function onReadyEvent(event) {
-        // access to player in all event handlers via event.target
         event.target.pauseVideo();
     }
-
+    
     function onPlayerStateChange(event) {
-        const time = getFormattedTime(600);
-        setT(event.data);
-        // if (event.data == YT.PlayerState.PAUSED) {
-        //     const time = getFormattedTime(player.getCurrentTime());
-        //     document.querySelector('#info').innerHTML = `Foi passado para o tempo: ${time}`;
-        // }
+        if (event.data === PlayerEvents.PAUSED) {
+            setTime(getFormattedTime(event.target.getCurrentTime()));
+        }
     }
 
     function getFormattedTime(timeInSeconds) {
@@ -29,22 +26,11 @@ function MainPage() {
         width: '640',
     };
 
-    // player = new YT.Player('ytplayer', {
-    //     height: '360',
-    //     width: '640',
-    //     videoId: 'tcYodQoapMg',
-    //     events: {
-    //         'onReady': onPlayerReady,
-    //         'onStateChange': onPlayerStateChange
-    //     }
-    // });
-
-
 return (
 
     <main>
         <YouTube videoId="tcYodQoapMg" opts={opts} onReady={onReadyEvent} onStateChange={onPlayerStateChange} />
-        {t}
+        {time}
     </main>
 );
 }
