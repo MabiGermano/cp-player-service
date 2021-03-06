@@ -11,27 +11,22 @@ app.use(routes);
 
 const server = http.createServer(app);
 const io = socketIO(
-    server,
-    {
+    server, {
         cors: {
-            origin: 'http://localhost:3000',
+            origin: '*',
             methods: ['GET', 'POST']
         }
     }
 );
 
-let interval;
 io.on('connection', (socket) => {
     console.log('New client connected');
-    if (interval) {
-        clearInterval(interval);
-    }
 
-    socket.on('PlayerAction', (time) => {
+    socket.on('PlayerAction', (action) => {
         console.log('ação feita');
-        socket.broadcast.emit('SetTune', time);
+        socket.broadcast.emit('SetTune', action);
     });
-    
+
     socket.on('disconnect', () => {
         console.log('Client disconnected');
     });
