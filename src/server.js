@@ -2,8 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const socketIO = require("socket.io");
-
+const axios = require("axios");
 const routes = require("./routes");
+const events = require("./models/Events");
 
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
@@ -22,13 +23,30 @@ io.on("connection", (socket) => {
   console.log("New client connected");
 
   const room = socket.request._query.id;
-  console.log(room);
   socket.join(room);
 
   socket.on("PlayerAction", (data) => {
-    const {room, action} = data;
+    const { roomId, action } = data;
     console.log("ação feita");
-    socket.to(room).emit("SetTune", action);
+    socket.to(roomId).emit("SetTune", action);
+  });
+
+  socket.on("NextVideo", (data) => {
+    const { roomId, action } = data;
+
+    axios.get(`http://127.0.0.1:3334/${roomId}/playlist/next-video`)
+    .then(playlist => {
+        socket.to(roomId).emit("UpdateVideo", playlist);
+    })
+    
+  });
+
+  socket.on("PreviousVideo", (data) => {
+    const { roomId, action } = data;
+    axios.get(`http://127.0.0.1:3334/${roomId}/playlist/previous-video`)
+    .then(playlist => {
+        socket.to(roomId).emit("UpdateVideo", playlist);
+    })
   });
 
   socket.on("disconnect", () => {
@@ -36,7 +54,7 @@ io.on("connection", (socket) => {
   });
 });
 
-exports.emitEvent = function (roomIdentifier, data) {  
+exports.emitEvent = function (roomIdentifier, data) {
   io.to(roomIdentifier).emit("UpdatePlaylist", data);
 };
 
