@@ -32,20 +32,34 @@ io.on("connection", (socket) => {
   });
 
   socket.on("NextVideo", (data) => {
-    const { roomId, action } = data;
+    const { roomId } = data;
 
     axios.get(`http://127.0.0.1:3334/${roomId}/playlist/next-video`)
-    .then(playlist => {
-        socket.to(roomId).emit("UpdateVideo", playlist);
+    .then(data => {
+        const {playlist} = data.data;
+        console.log(playlist.currentPlaying);
+        io.in(roomId).emit("UpdatePlayerVideo", playlist);
     })
     
   });
 
   socket.on("PreviousVideo", (data) => {
-    const { roomId, action } = data;
+    const { roomId } = data;
     axios.get(`http://127.0.0.1:3334/${roomId}/playlist/previous-video`)
-    .then(playlist => {
-        socket.to(roomId).emit("UpdateVideo", playlist);
+    .then(data => {
+      const {playlist} = data.data;
+      console.log(playlist.currentPlaying);
+        io.in(roomId).emit("UpdatePlayerVideo", playlist);
+    })
+  });
+
+  socket.on("PlaySpecificVideo", (data) => {
+    const { roomId, action } = data;
+
+    axios.put(`http://127.0.0.1:3334/${roomId}/playlist/`, action.playlist)
+    .then(data => {
+      const {playlist} = data.data;
+        io.in(roomId).emit("UpdatePlayerVideo", playlist);
     })
   });
 
