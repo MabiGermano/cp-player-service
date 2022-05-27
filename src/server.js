@@ -5,6 +5,7 @@ const socketIO = require("socket.io");
 const axios = require("axios");
 const routes = require("./routes");
 const events = require("./models/Events");
+require("dotenv").config();
 
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
@@ -15,7 +16,7 @@ const server = http.createServer(app);
 const io = socketIO(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT"],
   },
 });
 
@@ -34,7 +35,7 @@ io.on("connection", (socket) => {
   socket.on("NextVideo", (data) => {
     const { roomId } = data;
 
-    axios.get(`http://127.0.0.1:3334/${roomId}/playlist/next-video`)
+    axios.get(`${process.env.PLAYLIST_SERVICE_ORIGIN}/${roomId}/playlist/next-video`)
     .then(data => {
         const {playlist} = data.data;
         console.log(playlist.currentPlaying);
@@ -45,7 +46,7 @@ io.on("connection", (socket) => {
 
   socket.on("PreviousVideo", (data) => {
     const { roomId } = data;
-    axios.get(`http://127.0.0.1:3334/${roomId}/playlist/previous-video`)
+    axios.get(`${process.env.PLAYLIST_SERVICE_ORIGIN}/${roomId}/playlist/previous-video`)
     .then(data => {
       const {playlist} = data.data;
       console.log(playlist.currentPlaying);
@@ -56,7 +57,7 @@ io.on("connection", (socket) => {
   socket.on("PlaySpecificVideo", (data) => {
     const { roomId, action } = data;
 
-    axios.put(`http://127.0.0.1:3334/${roomId}/playlist/`, action.playlist)
+    axios.put(`${process.env.PLAYLIST_SERVICE_ORIGIN}/${roomId}/playlist/`, action.playlist)
     .then(data => {
       const {playlist} = data.data;
         io.in(roomId).emit("UpdatePlayerVideo", playlist);
